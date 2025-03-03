@@ -6,6 +6,9 @@ server:
 grpc:
   server:
     port: 50051
+  client:
+    server-address: localhost
+    server-port: 50051
 
 
 spring:

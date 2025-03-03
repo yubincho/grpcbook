@@ -1,0 +1,113 @@
+syntax = "proto3";
+
+package com.example.grpcbook;
+
+option java_multiple_files = true;
+option java_package = "com.example.grpcbook.generated";
+
+// 독서 목표 정보
+message ReadingGoal {
+    string id = 1;
+    string book_id = 2;
+    string title = 3;
+    string description = 4;
+    bool completed = 5;
+    string category = 6;
+    string deadline = 7;
+}
+
+// 독서 목표 생성 요청
+message CreateGoalRequest {
+    string book_id = 1;
+    string title = 2;
+    string description = 3;
+    string category = 4;
+    string deadline = 5;
+}
+
+// 독서 목표 조회 요청
+message GetGoalRequest {
+    string id = 1;
+}
+
+// 독서 목표 목록 조회 요청
+message ListGoalsRequest {
+    string category = 1; // 선택적 카테고리 필터
+    bool completed = 2; // 선택적 완료 상태 필터
+    int32 page = 3;
+    int32 size = 4;
+}
+
+// 독서 목표 목록 응답
+message ListGoalsResponse {
+    repeated ReadingGoal goals = 1;
+    int32 total_count = 2;
+}
+
+// 독서 목표 업데이트 요청
+message UpdateGoalRequest {
+    string id = 1;
+    string title = 2;
+    string description = 3;
+    string category = 4;
+    string deadline = 5;
+}
+
+// 독서 목표 삭제 요청
+message DeleteGoalRequest {
+    string id = 1;
+}
+
+// 독서 목표 삭제 응답
+message DeleteGoalResponse {
+    bool success = 1;
+}
+
+// 독서 목표 완료 요청
+message CompleteGoalRequest {
+    string id = 1;
+    bool completed = 2;
+}
+
+// 독서 목표 응답
+message GoalResponse {
+    ReadingGoal goal = 1;
+}
+
+// 독서 목표 업데이트 요청 (스트리밍용)
+message GoalUpdateRequest {
+    string id = 1;
+    string action = 2; // "progress", "complete", "note" 등
+    string data = 3; // 액션에 따른 추가 데이터
+}
+
+// 독서 목표 업데이트 응답 (스트리밍용)
+message GoalUpdateResponse {
+    string id = 1;
+    string status = 2;
+    ReadingGoal goal = 3;
+}
+
+// 독서 목표 서비스
+service ReadingGoalService {
+    // 독서 목표 생성
+    rpc CreateGoal(CreateGoalRequest) returns (GoalResponse);
+
+    // 독서 목표 조회
+    rpc GetGoal(GetGoalRequest) returns (GoalResponse);
+
+    // 독서 목표 목록 조회
+    rpc ListGoals(ListGoalsRequest) returns (ListGoalsResponse);
+
+    // 독서 목표 업데이트
+    rpc UpdateGoal(UpdateGoalRequest) returns (GoalResponse);
+
+    // 독서 목표 삭제
+    rpc DeleteGoal(DeleteGoalRequest) returns (DeleteGoalResponse);
+
+    // 독서 목표 완료 상태 변경
+    rpc CompleteGoal(CompleteGoalRequest) returns (GoalResponse);
+
+    // 실시간 독서 목표 업데이트 (양방향 스트리밍)
+    rpc StreamGoalUpdates(stream GoalUpdateRequest) returns (stream GoalUpdateResponse);
+}
